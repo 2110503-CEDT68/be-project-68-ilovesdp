@@ -1,12 +1,12 @@
 const Appointment = require('../models/Appointment');
-const Hospital = require('../models/Hospital');
+const Dentist = require('../models/Dentist');
 
 exports.getAppointments = async (req,res,next) => {
-    // Build a single filter that supports nested hospital routes and role-based access.
+    // Build a single filter that supports nested dentist routes and role-based access.
     const filter = {};
 
-    if (req.params.hospitalId) {
-        filter.hospital = req.params.hospitalId;
+    if (req.params.dentistId) {
+        filter.dentist = req.params.dentistId;
     }
 
     // General user can only see their own appointments. Admin can see all appointments.
@@ -19,21 +19,21 @@ exports.getAppointments = async (req,res,next) => {
     try {
         const appointments = await query;
 
-        // Preserve the hospital id even when populate cannot resolve the document.
-        const hospitalIds = new Map();
+        // Preserve the dentist id even when populate cannot resolve the document.
+        const dentistIds = new Map();
         appointments.forEach((appointment) => {
-            hospitalIds.set(String(appointment._id), appointment.hospital);
+            dentistIds.set(String(appointment._id), appointment.dentist);
         });
 
         await Appointment.populate(appointments, {
-            path: 'hospital',
-            select: 'name province tel'
+            path: 'dentist',
+            select: 'name yearsOfExperience areaOfExpertise'
         });
 
-        // If populate fails (missing hospital), keep the original id in the hospital field.
+        // If populate fails (missing dentist), keep the original id in the dentist field.
         appointments.forEach((appointment) => {
-            if (appointment.hospital === null) {
-                appointment.hospital = hospitalIds.get(String(appointment._id));
+            if (appointment.dentist === null) {
+                appointment.dentist = dentistIds.get(String(appointment._id));
             }
         });
         res.status(200).json({
@@ -53,8 +53,8 @@ exports.getAppointments = async (req,res,next) => {
 exports.getAppointment = async (req,res,next) => {
     try {
         const appointment = await Appointment.findById(req.params.id).populate({
-            path: 'hospital',
-            select: 'name province tel'
+            path: 'dentist',
+            select: 'name yearsOfExperience areaOfExpertise'
         });
 
         if (!appointment) {
@@ -79,14 +79,14 @@ exports.getAppointment = async (req,res,next) => {
 
 exports.addAppointment = async (req,res,next) => {
     try {
-        req.body.hospital = req.params.hospitalId;
+        req.body.dentist = req.params.dentistId;
 
-        const hospital = await Hospital.findById(req.params.hospitalId);
+        const dentist = await Dentist.findById(req.params.dentistId);
 
-        if (!hospital) {
+        if (!dentist) {
             return res.status(404).json({
                 success:false,
-                message:`No hospital with the id of ${req.params.hospitalId}`
+                message:`No dentist with the id of ${req.params.dentistId}`
             });
         }
         console.log(req.body);
@@ -94,7 +94,7 @@ exports.addAppointment = async (req,res,next) => {
         //add user to req.body
         req.body.user = req.user.id;
         const existingAppointment = await Appointment.find({user: req.user.id});
-        if (existingAppointment.length >= 3 && req.user.role !== 'admin') {
+        if (existingAppointment.length >= 1 && req.user.role !== 'admin') {
             return res.status(400).json({
                 success:false,
                 message:`The user with ID ${req.user.id} has already made an appointment`

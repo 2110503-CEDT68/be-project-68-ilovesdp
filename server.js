@@ -13,11 +13,11 @@ app.use(cookieParser());
 
 app.use(express.json());
 
-const hospitals = require('./routes/hospitals');
+const dentists = require('./routes/dentists');
 const auth = require('./routes/auth');
 const appointments = require('./routes/appointments');
 
-app.use('/api/v1/hospitals', hospitals);
+app.use('/api/v1/dentists', dentists);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/appointments', appointments);
 

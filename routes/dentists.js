@@ -1,14 +1,14 @@
 const express = require('express');
-const { getHospitals, getHospital, createHospital, updateHospital, deleteHospital } = require('../controllers/hospitals');
+const { getDentists, getDentist, createDentist, updateDentist, deleteDentist } = require('../controllers/dentists');
 const router = express.Router();
 const {protect, authorize} = require('../middleware/auth');
 
 
 const appointmentsRouter = require('./appointments');
-// Mount nested appointments routes for a specific hospital, e.g. /api/v1/hospitals/:hospitalId/appointments
-router.use('/:hospitalId/appointments', appointmentsRouter);
+// Mount nested appointments routes for a specific dentist, e.g. /api/v1/dentists/:dentistId/appointments
+router.use('/:dentistId/appointments', appointmentsRouter);
 
-router.route('/').get(getHospitals).post(protect, authorize('admin'), createHospital);
-router.route('/:id').get(getHospital).put(protect, authorize('admin'), updateHospital).delete(protect, authorize('admin'), deleteHospital);
+router.route('/').get(getDentists).post(protect, authorize('admin'), createDentist);
+router.route('/:id').get(getDentist).put(protect, authorize('admin'), updateDentist).delete(protect, authorize('admin'), deleteDentist);
 
 module.exports = router;

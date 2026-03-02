@@ -1,6 +1,6 @@
 const mongose = require('mongoose');
 
-const HospitalSchema = new mongose.Schema({
+const DentistSchema = new mongose.Schema({
     name: {
         type: String,
         required: [true, 'Please add a name'],
@@ -8,30 +8,16 @@ const HospitalSchema = new mongose.Schema({
         trim: true,
         maxlength: [50, 'Name can not be more than 50 characters']
     },
-    address: {
-        type: String,
-        required: [true, 'Please add an address']
+    yearsOfExperience: {
+        type: Number,
+        required: [true, 'Please add years of experience']
     },
-    district: {
+    areaOfExpertise: {
         type: String,
-        required: [true, 'Please add a district']
+        required: [true, 'Please add an area of expertise'],
+        enum: ['Orthodontics', 'Endodontics', 'Prosthodontics', 'Pediatric Dentistry', 'Oral Surgery']
     },
-    province: {
-        type: String,
-        required: [true, 'Please add a province']
-    },
-    postalcode: {
-        type: String,
-        required: [true, 'Please add a postalcode'],
-        maxlength: [5, 'Postalcode can not be more than 5 digits']
-    },
-    tel: {
-        type: String,
-    },
-    region: {
-        type: String,
-        required: [true, 'Please add a region']
-    }
+
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
@@ -39,11 +25,11 @@ const HospitalSchema = new mongose.Schema({
 
 
 //Reverse populate with virtuals
-HospitalSchema.virtual('appointments', {
+DentistSchema.virtual('appointments', {
     ref: 'Appointment',
     localField: '_id',
-    foreignField: 'hospital',
+    foreignField: 'dentist',
     justOne: false
 });
 
-module.exports = mongose.model('Hospital', HospitalSchema);
+module.exports = mongose.model('Dentist', DentistSchema);
