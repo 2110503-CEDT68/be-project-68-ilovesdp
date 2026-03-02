@@ -6,10 +6,11 @@ exports.register = async (req,res,next) => {
 
 exports.register = async (req,res,next) => {
     try {
-        const {name,email,password,role} = req.body;
+        const {name,tel,email,password,role} = req.body;
 
         const user = await User.create({
             name,
+            tel,
             email,
             password,
             role
