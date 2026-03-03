@@ -9,7 +9,11 @@ const UserSchema=new mongoose.Schema({
     },
     tel:{
         type:String,
-        required:[true,'Please add a telephone number']
+        required:[true,'Please add a telephone number'],
+        match: [
+            /^[0-9]{9,10}$/,
+            'Please add a valid telephone number (9-10 digits)'
+        ]
     },
     email:{
         type: String,

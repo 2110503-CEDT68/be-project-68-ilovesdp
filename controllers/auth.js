@@ -1,10 +1,6 @@
 const User = require('../models/User');
 
 exports.register = async (req,res,next) => {
-    res.status(200).json({success:true});
-};
-
-exports.register = async (req,res,next) => {
     try {
         const {name,tel,email,password,role} = req.body;
 
@@ -15,8 +11,6 @@ exports.register = async (req,res,next) => {
             password,
             role
         });
-        // const token = user.getSignedJwtToken();
-        // res.status(200).json({success:true, token});
         sendTokenResponse(user, 200, res);
 
     } catch (err) {
@@ -44,8 +38,6 @@ exports.login = async (req,res,next) => {
         return res.status(401).json({success:false, msg:'Invalid credentials'});
     }
 
-    // const token = user.getSignedJwtToken();
-    // res.status(200).json({success:true, token});
     sendTokenResponse(user, 200, res);
 };
 
@@ -84,4 +76,4 @@ exports.logout = async(req,res,next) => {
         success: true,
         data:{}
     });
-}
+};
