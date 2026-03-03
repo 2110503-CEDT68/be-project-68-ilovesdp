@@ -64,6 +64,14 @@ exports.getAppointment = async (req,res,next) => {
             });
         }
 
+        // Check ownership: only the appointment owner or admin can view
+        if (appointment.user.toString() !== req.user.id && req.user.role !== 'admin') {
+            return res.status(403).json({
+                success:false,
+                message:`User ${req.user.id} is not authorized to view this appointment`
+            });
+        }
+
         res.status(200).json({
             success:true,
             data:appointment
