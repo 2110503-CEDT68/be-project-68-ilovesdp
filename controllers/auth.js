@@ -20,25 +20,30 @@ exports.register = async (req,res,next) => {
 };
 
 exports.login = async (req,res,next) => {
-    const {email,password} = req.body;
+    try {
+        const {email,password} = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({success:false, msg:'Please provide an email and password'});
+        if (!email || !password) {
+            return res.status(400).json({success:false, msg:'Please provide an email and password'});
+        }
+
+        const user = await User.findOne({email}).select('+password');
+
+        if (!user) {
+            return res.status(400).json({success:false, msg:'Invalid credentials'});
+        }
+
+        const isMatch = await user.matchPassword(password);
+
+        if (!isMatch) {
+            return res.status(401).json({success:false, msg:'Invalid credentials'});
+        }
+
+        sendTokenResponse(user, 200, res);
+    } catch (err) {
+        res.status(500).json({success:false, msg:'Server error during login'});
+        console.log(err.stack);
     }
-
-    const user = await User.findOne({email}).select('+password');
-
-    if (!user) {
-        return res.status(400).json({success:false, msg:'Invalid credentials'});
-    }
-
-    const isMatch = await user.matchPassword(password);
-
-    if (!isMatch) {
-        return res.status(401).json({success:false, msg:'Invalid credentials'});
-    }
-
-    sendTokenResponse(user, 200, res);
 };
 
 const sendTokenResponse = (user, statusCode, res) => {
@@ -59,11 +64,16 @@ const sendTokenResponse = (user, statusCode, res) => {
 };
 
 exports.getMe = async (req,res,next) => {
-    const user = await User.findById(req.user.id);
-    res.status(200).json({
-        success:true, 
-        data:user
-    });
+    try {
+        const user = await User.findById(req.user.id);
+        res.status(200).json({
+            success:true, 
+            data:user
+        });
+    } catch (err) {
+        res.status(500).json({success:false, msg:'Server error'});
+        console.log(err.stack);
+    }
 };
 
 exports.logout = async(req,res,next) => {

@@ -85,11 +85,16 @@ exports.getDentist = async (req,res,next) => {
 };
 
 exports.createDentist = async (req,res,next) => {
-    const dentist = await Dentist.create(req.body);
-    res.status(201).json({
-        success:true, 
-        data:dentist
-    });
+    try {
+        const dentist = await Dentist.create(req.body);
+        res.status(201).json({
+            success:true, 
+            data:dentist
+        });
+    } catch (err) {
+        res.status(400).json({success:false, msg:err.message});
+        console.log(err.stack);
+    }
 };
 
 exports.updateDentist = async(req,res,next) => {
